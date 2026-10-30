@@ -103,7 +103,7 @@ st.markdown("""
         letter-spacing: 1px;
     }
     </style>
-""", unsafe_html=True)
+""", unsafe_allow_html=True)
 
 # 3. Top Section Brand Ribbon
 st.markdown("""
@@ -113,7 +113,7 @@ st.markdown("""
         Gene Checking ARCHITECTURE ENGINE
     </div>
 </div>
-""", unsafe_html=True)
+""", unsafe_allow_html=True)
 
 # 4. Multi-Page Selection Matrix Setup
 if 'current_pane' not in st.session_state:
@@ -131,7 +131,7 @@ with nav_col3:
     if st.button("3. Clinical Profiler Hub", use_container_width=True):
         st.session_state.current_pane = "profiler"
 
-st.markdown("<br>", unsafe_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
 # 5. Configurations Workspace
 st.sidebar.markdown("### SYSTEM CONFIGURATION")
@@ -143,8 +143,8 @@ st.sidebar.caption("Nebius Architecture Token: Initialized via internal environm
 
 # Main Page Routing Engine logic
 if st.session_state.current_pane == "registry":
-    st.markdown("<div class='bubble-header'>Sequence Input Workspace</div>", unsafe_html=True)
-    st.markdown("<div class='content-block'>", unsafe_html=True)
+    st.markdown("<div class='bubble-header'>Sequence Input Workspace</div>", unsafe_allow_html=True)
+    st.markdown("<div class='content-block'>", unsafe_allow_html=True)
     col_a, col_b = st.columns(2)
     with col_a:
         st.session_state.disease = st.text_input("RARE GENETIC CONDITION", value=st.session_state.get('disease', 'Cystic Fibrosis'))
@@ -156,12 +156,12 @@ if st.session_state.current_pane == "registry":
         )
         st.session_state.current_meds = st.text_input("CONCOMITANT DAILY PRESCRIPTIONS", value=st.session_state.get('current_meds', 'Warfarin'))
     
-    st.markdown("<br><p style='color: #00D488; font-weight: bold;'>Data profiles loaded. Navigate to panel 2 or 3 above to immediately compute precision genetic distance matrices and map safe clinical trials.</p>", unsafe_html=True)
-    st.markdown("</div>", unsafe_html=True)
+    st.markdown("<br><p style='color: #00D488; font-weight: bold;'>Data profiles loaded. Navigate to panel 2 or 3 above to immediately compute precision genetic distance matrices and map safe clinical trials.</p>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 elif st.session_state.current_pane == "distance" or st.session_state.current_pane == "profiler":
-    st.markdown(f"<div class='bubble-header'>{st.session_state.current_pane.upper()} REPORT INTERFACE</div>", unsafe_html=True)
-    st.markdown("<div class='content-block'>", unsafe_html=True)
+    st.markdown(f"<div class='bubble-header'>{st.session_state.current_pane.upper()} REPORT INTERFACE</div>", unsafe_allow_html=True)
+    st.markdown("<div class='content-block'>", unsafe_allow_html=True)
     
     disease_input = st.session_state.get('disease', 'Cystic Fibrosis')
     variant_input = st.session_state.get('variant', 'F508del')
@@ -205,7 +205,7 @@ Concomitant {meds_input} Panel | 0.42 Moderate Deviation | MODERATE / MONITOR IN
 2.  **Dosage Modification Strategy:** If the patient proceeds with Protocol NCT0621414, decrease initial baseline experimental molecular intake by a minimum of 40% to account for reduced metabolic breakdown capacity.
 3.  **Anticoagulant Co-Therapy Guard:** Cross-reference active interaction timelines with current daily prescriptions to protect system safety parameters throughout the course of study.
         """)
-    st.markdown("</div>", unsafe_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # 6. Design Specific Metrics Footer
 st.markdown("""
@@ -213,4 +213,4 @@ st.markdown("""
     Used by 1,000+ users across the world including researchers in France, the United States, Germany, the United Kingdom, and Japan.
     <div class="disclaimer-text">Notice: For design presentation purposes only. Analytical assets represent statistical simulations.</div>
 </div>
-""", unsafe_html=True)
+""", unsafe_allow_html=True)
