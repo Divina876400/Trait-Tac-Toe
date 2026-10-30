@@ -198,7 +198,7 @@ st.markdown("""
 <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 2px solid #FF6B57; margin-bottom: 35px; animation: ttt-fade-up 0.4s ease both;">
     <div style="font-size: 32px; font-weight: 800; letter-spacing: 3px; color: #FFFFFF;">● TRAIT TAC TOE</div>
     <div style="font-size: 12px; letter-spacing: 1.5px; color: #FF6B57; font-weight: 600; text-transform: uppercase;">
-        <span class="live-dot"></span>WORLDGENETICS ARCHITECTURE ENGINE
+        <span class="live-dot"></span>Gene checker
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -319,7 +319,7 @@ elif st.session_state.current_pane == "distance" or st.session_state.current_pan
 # 6. Design Specific Metrics Footer
 st.markdown("""
 <div class="design-footer">
-    <div>TRAIT TAC TOE | WORLDGENETICS ARCHITECTURE ENGINE</div>
+    <div>TRAIT TAC TOE | Genetic test engine</div>
     <div class="disclaimer-text">Research and decision-support use only. Not a substitute for clinical judgment.</div>
 </div>
 """, unsafe_allow_html=True)
