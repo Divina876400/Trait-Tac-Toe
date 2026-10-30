@@ -2,39 +2,30 @@ Dependencies and imports:
 - streamlit
 - langchain-nvidia-ai-endpoints (provides ChatNVIDIA)
 - langchain-community (provides TavilySearchResults)
-- tavily-python (required at runtime by TavilySearchResults)
-- Install with: pip install streamlit langchain-nvidia-ai-endpoints langchain-community tavily-python
+- Standard library: os
 
 import streamlit as st
 import os
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from langchain_community.tools.tavily_search import TavilySearchResults
 
-# 1. Force the World Genetics Minimalist Light Theme via CSS
 st.set_page_config(page_title="GENMATCH RX", layout="wide")
 
 st.markdown("""
     <style>
-    /* Main Background and Typography */
     .stApp {
         background-color: #F8F9FA !important;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    
-    /* Global Text Colors to Deep Charcoal */
     h1, h2, h3, p, label, .stMarkdown {
         color: #1A1A1A !important;
     }
-    
-    /* Input Box Styles - Sharp Borders, Flat White Background */
     .stTextInput input, .stSelectbox div[data-baseweb="select"] {
         background-color: #FFFFFF !important;
         border: 1px solid #E0E0E0 !important;
         border-radius: 4px !important;
         color: #1A1A1A !important;
     }
-    
-    /* Flat Matte Blue Primary Button */
     .stButton>button {
         background-color: #1A2E40 !important;
         color: #FFFFFF !important;
@@ -50,24 +41,9 @@ st.markdown("""
         background-color: #2C4A66 !important;
         color: #FFFFFF !important;
     }
-    
-    /* Visual Matrix Tags */
-    .tag-critical {
-        background-color: #FDF2F2; color: #9B1C1C; 
-        padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid #F8B4B4;
-    }
-    .tag-monitor {
-        background-color: #FDF8F2; color: #92400E; 
-        padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid #FCD34D;
-    }
-    .tag-verified {
-        background-color: #F0FDF4; color: #166534; 
-        padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid #86EFAC;
-    }
     </style>
 """, unsafe_html=True)
 
-# 2. Top Navigation Bar Layout
 st.markdown("""
 <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid #E0E0E0; margin-bottom: 30px;">
     <div style="font-size: 24px; font-weight: 700; letter-spacing: 2px; color: #1A1A1A;">GENMATCH RX</div>
@@ -77,16 +53,14 @@ st.markdown("""
 </div>
 """, unsafe_html=True)
 
-# API Keys Configuration in Sidebar to keep main dashboard pristine
-st.sidebar.markdown("### SYSTEM CONFIGULATION")
+st.sidebar.markdown("### SYSTEM CONFIGURATION")
 nvidia_key = st.sidebar.text_input("NVIDIA API KEY", type="password", value=os.getenv("NVIDIA_API_KEY", ""))
 tavily_key = st.sidebar.text_input("TAVILY API KEY", type="password", value=os.getenv("TAVILY_API_KEY", ""))
 
 if nvidia_key and tavily_key:
     st.sidebar.markdown("<span style='color: #166534; font-size: 12px; font-weight: bold;'>INTEGRATION ARCHITECTURE ONLINE</span>", unsafe_html=True)
 
-# 3. Split-Pane Canvas Setup (35% Left Control Panel, 65% Right Visualizer Panel)
-left_pane, right_pane = st.columns([35, 65])
+left_pane, right_pane = st.columns(2)
 
 with left_pane:
     st.markdown("<div style='font-size: 14px; font-weight: 600; letter-spacing: 1px; color: #4B5563; margin-bottom: 15px;'>REGISTRY DATA INPUT</div>", unsafe_html=True)
@@ -105,14 +79,12 @@ with left_pane:
     analyze_button = st.button("RUN GENOMIC ALIGNMENT")
 
 with right_pane:
-    # Initial state placeholder mimicking an unpopulated genetic mapping grid
     if not analyze_button:
         st.markdown("""
         <div style="border: 1px dashed #E0E0E0; border-radius: 4px; height: 400px; display: flex; align-items: center; justify-content: center; background-color: #FFFFFF;">
             <div style="color: #9CA3AF; font-size: 13px; letter-spacing: 1px; text-transform: uppercase;">Awaiting Clinical Registry Profile Submission</div>
         </div>
         """, unsafe_html=True)
-        
     else:
         if not nvidia_key or not tavily_key:
             st.error("Missing required credentials. Populate API inputs inside configuration workspace.")
@@ -122,7 +94,6 @@ with right_pane:
             os.environ["NVIDIA_API_KEY"] = nvidia_key
             os.environ["TAVILY_API_KEY"] = tavily_key
             
-            # Agent execution
             with st.spinner("Executing real-time registry query..."):
                 tavily = TavilySearchResults(max_results=5)
                 search_query = f"open clinical trials targeting {disease} mutation {variant} therapeutic drug molecules"
@@ -158,6 +129,5 @@ with right_pane:
                 
                 response = llm.invoke(prompt)
             
-            # Render the final clean structured output container
             st.markdown("<div style='font-size: 14px; font-weight: 600; letter-spacing: 1px; color: #4B5563; margin-bottom: 15px;'>GENETIC DISTANCE & TRIAL ALIGNMENT ANALYSIS</div>", unsafe_html=True)
             st.markdown(response.content)
