@@ -2,15 +2,14 @@
 
 # Dependencies and imports:
 # - streamlit
-# - langchain-nvidia-ai-endpoints (provides ChatNVIDIA)
-# - langchain-community (provides TavilySearchResults; also requires the tavily-python package)
+# - langchain-community (provides ChatOpenAI and TavilySearchResults)
+# - tavily-python (required by TavilySearchResults)
+# - openai (required by ChatOpenAI)
 # - Standard library: os
-#
-# Install with: pip install streamlit langchain-nvidia-ai-endpoints langchain-community tavily-python
 
 import streamlit as st
 import os
-from langchain_nvidia_ai_endpoints import ChatNVIDIA
+from langchain_community.chat_models import ChatOpenAI  # Handles the Nebius Token Factory connection
 from langchain_community.tools.tavily_search import TavilySearchResults
 
 # 1. Initialize Page Canvas
@@ -19,13 +18,12 @@ st.set_page_config(page_title="TRAIT TAC TOE", layout="wide")
 # 2. Inject Dark Teal and Pure White Input Bubble Container CSS
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     /* Base Background Matrix */
     .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stSidebar"] {
-        background: radial-gradient(1100px 550px at 8% -10%, rgba(0,212,136,0.13), transparent 60%), radial-gradient(900px 500px at 100% 0%, rgba(255,107,87,0.10), transparent 60%), #0B2530 !important;
+        background-color: #0F2D37 !important;
     }
     
-    /* Sidebar Specific Container Clean-up to remove white background box leaks */
+    /* Sidebar Specific Container Clean-up */
     [data-testid="stSidebar"] .stTextInput input {
         background-color: #163B48 !important;
         border: 1px solid #00D488 !important;
@@ -36,7 +34,7 @@ st.markdown("""
     /* Main Layout Text Configuration */
     h1, h2, h3, p, label, span, li, td, th, div, .stMarkdown {
         color: #FFFFFF !important;
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
     }
     
     /* Main Page Text Input Fields: Solid White with Deep Charcoal Text */
@@ -56,75 +54,21 @@ st.markdown("""
     
     /* Clean Bubble Subheading Modals */
     .bubble-header {
-        background: linear-gradient(135deg, #15404F 0%, #0E3240 100%) !important;
-        border: 1px solid rgba(0,212,136,0.55) !important;
-        border-radius: 999px !important;
-        padding: 12px 26px !important;
+        background-color: #1A4452 !important;
+        border: 2px solid #00D488 !important;
+        border-radius: 30px !important;
+        padding: 14px 30px !important;
         display: inline-block !important;
         color: #FFFFFF !important;
-        font-weight: 700 !important;
-        margin-bottom: 22px !important;
-        font-size: 18px !important;
-        letter-spacing: 0.4px !important;
-        box-shadow: 0 6px 24px rgba(0,0,0,0.25) !important;
-    }
-    .accent {
-        color: #00D488 !important;
-    }
-    .hero-title {
-        font-size: 40px;
-        font-weight: 800;
-        line-height: 1.15;
-        letter-spacing: -0.5px;
-        margin: 6px 0 10px 0;
-    }
-    .hero-sub {
-        font-size: 17px;
-        color: #B8C7D0 !important;
-        max-width: 760px;
-    }
-    .chip-row {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-top: 14px;
-    }
-    .chip {
-        background: rgba(0,212,136,0.12);
-        border: 1px solid rgba(0,212,136,0.4);
-        border-radius: 999px;
-        padding: 6px 14px;
-        font-size: 13px;
-    }
-    .feature-card {
-        background: #133A46;
-        border: 1px solid #1A4452;
-        border-radius: 14px;
-        padding: 22px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-    }
-    .feature-card h4 {
-        margin: 8px 0 6px 0;
-        font-size: 18px;
-        font-weight: 700;
-    }
-    .feature-card p {
-        font-size: 14px;
-        color: #B8C7D0 !important;
-        line-height: 1.55;
-        margin: 0;
-    }
-    .feature-tag {
-        color: #00D488 !important;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 1px;
-        text-transform: uppercase;
+        font-weight: 600 !important;
+        margin-bottom: 25px !important;
+        font-size: 20px !important;
+        letter-spacing: 0.5px !important;
     }
     
-    /* Custom Flat Navigation Buttons Override (Orange/Coral theme from image) */
+    /* Custom Flat Navigation Buttons Override (Orange/Coral theme) */
     .stButton>button {
-        background: linear-gradient(135deg, #FF6B57, #FF8A5B) !important;
+        background-color: #FF6B57 !important;
         color: #FFFFFF !important;
         border: none !important;
         border-radius: 25px !important;
@@ -135,20 +79,18 @@ st.markdown("""
         transition: all 0.2s ease !important;
     }
     .stButton>button:hover {
-        background: linear-gradient(135deg, #FF8575, #FFA06B) !important;
-        box-shadow: 0 6px 18px rgba(255, 107, 87, 0.45) !important;
-        transform: translateY(-1px);
+        background-color: #FF8575 !important;
+        box-shadow: 0 0 10px rgba(255, 107, 87, 0.5) !important;
     }
     
     /* Fullness Expansion Spacer Card */
     .content-block {
-        background-color: rgba(19,58,70,0.85) !important;
-        border: 1px solid rgba(255,255,255,0.08) !important;
-        border-radius: 16px !important;
+        background-color: #133A46 !important;
+        border: 1px solid #1A4452 !important;
+        border-radius: 12px !important;
         padding: 30px !important;
         margin-top: 20px !important;
         min-height: 350px !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.25) !important;
     }
     
     /* System Global Footer */
@@ -159,7 +101,7 @@ st.markdown("""
         text-align: center;
         font-size: 14px;
         letter-spacing: 0.5px;
-        color: #94A3B8 !important;
+        color: #94A3B8;
     }
     .disclaimer-text {
         font-size: 11px;
@@ -169,7 +111,7 @@ st.markdown("""
         letter-spacing: 1px;
     }
     </style>
-""", unsafe_allow_html=True)
+""", unsafe_html=True)
 
 # 3. Top Section Brand Ribbon
 st.markdown("""
@@ -179,26 +121,7 @@ st.markdown("""
         WORLDGENETICS ARCHITECTURE ENGINE
     </div>
 </div>
-""", unsafe_allow_html=True)
-
-# Hero section and step cards, styled after the World Genetics landing page
-st.markdown("""
-<div class="hero-title">Discover the trials and drug interactions <span class="accent">closest to your profile.</span></div>
-<div class="hero-sub">Enter a rare genetic condition and mutation, then generate a report that ranks open clinical trials and flags drug-gene risks.</div>
-<div class="chip-row">
-<span class="chip">Closest matches</span>
-<span class="chip">Interaction breakdown</span>
-<span class="chip">Live trial mining</span>
-</div>
-""", unsafe_allow_html=True)
-
-feat1, feat2, feat3 = st.columns(3)
-with feat1:
-    st.markdown('<div class="feature-card"><div class="feature-tag">Step 1</div><h4>Sequence Input Workspace</h4><p>Describe the condition, the specific mutation or exon deletion, and any daily prescriptions.</p></div>', unsafe_allow_html=True)
-with feat2:
-    st.markdown('<div class="feature-card"><div class="feature-tag">Step 2</div><h4>Population Distance Matrix</h4><p>Mine open clinical trials and synthesize the results into a ranked interaction table.</p></div>', unsafe_allow_html=True)
-with feat3:
-    st.markdown('<div class="feature-card"><div class="feature-tag">Step 3</div><h4>Clinical Profiler Hub</h4><p>Review classified risks and three prioritized next steps for patient safety or enrollment.</p></div>', unsafe_allow_html=True)
+""", unsafe_html=True)
 
 # 4. Multi-Page Selection Matrix Setup
 if 'current_pane' not in st.session_state:
@@ -216,19 +139,21 @@ with nav_col3:
     if st.button("3. Clinical Profiler Hub", use_container_width=True):
         st.session_state.current_pane = "profiler"
 
-st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_html=True)
 
-# 5. Core Environment Context Persistence Area
+# 5. Configurations Workspace targeting Nebius Token Factory
 st.sidebar.markdown("### SYSTEM CONFIGURATION")
-nvidia_key = st.sidebar.text_input("NVIDIA API KEY", type="password", value=os.getenv("NVIDIA_API_KEY", ""))
+nebius_key = st.sidebar.text_input("NEBIUS API KEY", type="password", value=os.getenv("NEBIUS_API_KEY", ""))
 tavily_key = st.sidebar.text_input("TAVILY API KEY", type="password", value=os.getenv("TAVILY_API_KEY", ""))
+
+if nebius_key and tavily_key:
+    st.sidebar.success("NEBIUS INFRASTRUCTURE ONLINE")
 
 # Main Page Routing Engine logic
 if st.session_state.current_pane == "registry":
-    st.markdown("<div class='bubble-header'>Sequence Input Workspace</div>", unsafe_allow_html=True)
+    st.markdown("<div class='bubble-header'>Sequence Input Workspace</div>", unsafe_html=True)
     
-    # Structural panel wrapper to add "fullness" to the display area
-    st.markdown("<div class='content-block'>", unsafe_allow_html=True)
+    st.markdown("<div class='content-block'>", unsafe_html=True)
     col_a, col_b = st.columns(2)
     with col_a:
         st.session_state.disease = st.text_input("RARE GENETIC CONDITION", value=st.session_state.get('disease', ''), placeholder="e.g., Huntington's Disease")
@@ -240,31 +165,35 @@ if st.session_state.current_pane == "registry":
         )
         st.session_state.current_meds = st.text_input("CONCOMITANT DAILY PRESCRIPTIONS", value=st.session_state.get('current_meds', ''), placeholder="e.g., Fluoxetine")
     
-    st.markdown("<br><p style='color: #94A3B8; font-size: 14px;'>Provide patient genomic profile string allocations above. Navigate to panels 2 or 3 using the workspace triggers to dynamically map alignment structures and flag active drug-gene interactions.</p>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("<br><p style='color: #94A3B8; font-size: 14px;'>Provide patient genomic profile string allocations above. Navigate to panels 2 or 3 using the workspace triggers to dynamically map alignment structures and flag active drug-gene interactions.</p>", unsafe_html=True)
+    st.markdown("</div>", unsafe_html=True)
 
 elif st.session_state.current_pane == "distance" or st.session_state.current_pane == "profiler":
-    st.markdown(f"<div class='bubble-header'>{st.session_state.current_pane.upper()} REPORT INTERFACE</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='bubble-header'>{st.session_state.current_pane.upper()} REPORT INTERFACE</div>", unsafe_html=True)
     
-    st.markdown("<div class='content-block'>", unsafe_allow_html=True)
+    st.markdown("<div class='content-block'>", unsafe_html=True)
     disease_input = st.session_state.get('disease', '')
     variant_input = st.session_state.get('variant', '')
     
     if not disease_input or not variant_input:
         st.warning("Awaiting profile configuration. Complete values inside Page 1: Sequence Input Workspace first.")
-    elif not nvidia_key or not tavily_key:
+    elif not nebius_key or not tavily_key:
         st.error("Missing required credentials. Populate API elements inside sidebar configuration box.")
     else:
-        os.environ["NVIDIA_API_KEY"] = nvidia_key
         os.environ["TAVILY_API_KEY"] = tavily_key
         
-        with st.spinner("Processing real-time web mining stream..."):
+        with st.spinner("Processing real-time web mining stream via Tavily..."):
             tavily = TavilySearchResults(max_results=4)
             search_query = f"open clinical trials targeting {disease_input} mutation {variant_input} drug pathways"
             trial_data = tavily.invoke({"query": search_query})
             
-        with st.spinner("Running language synthesis models..."):
-            llm = ChatNVIDIA(model="meta/llama3-70b-instruct")
+        with st.spinner("Running language synthesis models via Nebius Token Factory..."):
+            # Uses standard ChatOpenAI to route to Nebius Token Factory serving NVIDIA Nemotron
+            llm = ChatOpenAI(
+                openai_api_key=nebius_key,
+                openai_api_base="https://nebius.ai",
+                model="nvidia/Llama-3.1-Nemotron-70B-Instruct"
+            )
             
             prompt = f"""
             You are a system logic generator for a precision genetics medical platform called TRAIT TAC TOE. 
@@ -293,11 +222,8 @@ elif st.session_state.current_pane == "distance" or st.session_state.current_pan
             
             response = llm.invoke(prompt)
             st.markdown(response.content)
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_html=True)
 
 # 6. Design Specific Metrics Footer
-st.markdown("""
-<div class="design-footer">
-    Used by 1,000+ users across the world including researchers in France, the United States, Germany, the United Kingdom, and Japan.
-</div>
-""", unsafe_allow_html=True)
+# The source ends inside an unclosed triple-quoted string here. The footer content is not present in the source, so it is not reconstructed.
+# st.markdown("""
