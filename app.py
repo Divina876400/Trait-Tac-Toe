@@ -109,8 +109,7 @@ st.markdown("""
 st.markdown("""
 <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 2px solid #FF7F66; margin-bottom: 30px;">
     <div style="font-size: 26px; font-weight: 800; letter-spacing: 3px; color: #FFFFFF;"><span class="brand-dot"></span>TRAIT TAC TOE</div>
-    <div style="font-size: 11px; letter-spacing: 1.5px; color: #FFF7F2; font-weight: 600; text-transform: uppercase;">
-        WORLDGENETICS ARCHITECTURE ENGINE
+    
     </div>
 </div>
 """, unsafe_allow_html=True)
