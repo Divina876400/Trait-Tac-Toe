@@ -1,8 +1,4 @@
-Dependencies and imports:
-- streamlit
-- langchain-nvidia-ai-endpoints (provides ChatNVIDIA)
-- langchain-community (provides TavilySearchResults)
-- Standard library: os
+
 
 import streamlit as st
 import os
